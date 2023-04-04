@@ -2,6 +2,7 @@ package topic
 
 import (
 	"errors"
+	"fmt"
 	"github.com/YFR718/ymq/pkg/common"
 )
 
@@ -10,6 +11,7 @@ type Topic struct {
 	Partitions  int
 	Replication int
 	MessageSize int
+	Msg         []byte
 }
 
 type TopicManager struct {
@@ -32,11 +34,13 @@ func (t *TopicManager) Delete(topic Topic) error {
 	return nil
 }
 
-func (t *TopicManager) Send(topic Topic, data []byte) error {
+func (t *TopicManager) Send(topic Topic) error {
 	if _, ok := t.Topics[topic.Name]; !ok {
 		return errors.New(common.TOPIC_NOT_EXIST)
 	}
+	data := topic.Msg
 	t.Topics[topic.Name] <- data
+	fmt.Println(topic.Name, " get data", string(data))
 	return nil
 }
 

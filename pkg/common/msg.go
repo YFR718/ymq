@@ -38,6 +38,7 @@ type Message struct {
 func (m *Message) Marshal() []byte {
 	// create binary message
 	msg := make([]byte, 8+2+len(m.Body))
+	m.Length = uint32(10 + len(m.Body))
 	// put data to msg
 	binary.BigEndian.PutUint32(msg[0:4], m.Length)
 	msg[8] = m.Header.Type
@@ -59,8 +60,10 @@ func Unmarshal(msg []byte) (*Message, error) {
 	message.Header.Type = msg[8]
 	message.Header.UserID = msg[9]
 	message.Body = msg[10:]
+	copy(msg[4:8], []byte{0, 0, 0, 0})
 	// check CRC
 	if message.CRC != crc32.ChecksumIEEE(msg) {
+		println(message.CRC, crc32.ChecksumIEEE(msg), len(msg), message.Length)
 		return nil, errors.New(ERROR_CRC)
 	}
 	return message, nil

@@ -10,6 +10,7 @@ import (
 func main() {
 	sys := system.System{Error: make(chan error)}
 	topic.InitManager()
+
 	go net.Listen(sys)
 
 	select {
